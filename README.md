@@ -12,6 +12,7 @@ hotfix_1
 
 hotfix_2.1
 hotfix_2.2
+hotfix_2.3
 
 hotfix_3.1
 hotfix_3.2
