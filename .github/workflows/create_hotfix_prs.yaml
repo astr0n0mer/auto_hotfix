@@ -17,22 +17,22 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Create Pull Request to Main
-        uses: repo-sync/pull-request@v2
-        with:
-          source_branch: ${{ github.ref_name }}
-          destination_branch: main
-          pr_title: "Hotfix PR to main"
-          pr_body: "This pull request was automatically created for hotfix branch ${{ github.ref_name }} to merge into main."
-          pr_draft: false
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Pull Request to Candidate
+      - name: Create Pull Request to candidate
         uses: repo-sync/pull-request@v2
         with:
           source_branch: ${{ github.ref_name }}
           destination_branch: candidate
-          pr_title: "Hotfix PR to candidate"
-          pr_body: "This pull request was automatically created for hotfix branch ${{ github.ref_name }} to merge into candidate."
+          pr_title: "hotfix: from ${{ github.ref_name }} to candidate"
+          pr_body: "This pull request was automatically created for hotfix branch `${{ github.ref_name }}` to merge into `candidate`."
+          pr_draft: false
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Pull Request to main
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: ${{ github.ref_name }}
+          destination_branch: main
+          pr_title: "hotfix: from ${{ github.ref_name }} to main"
+          pr_body: "This pull request was automatically created for hotfix branch `${{ github.ref_name }}` to merge into `main`."
           pr_draft: false
           github_token: ${{ secrets.GITHUB_TOKEN }}
