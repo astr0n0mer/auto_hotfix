@@ -18,3 +18,4 @@ hotfix_3.4
 hotfix_3.5
 
 hotfix_4.1
+hotfix_4.2
