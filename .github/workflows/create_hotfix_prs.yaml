@@ -1,12 +1,15 @@
 name: Hotfix Pull Request Automation
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
-      - 'hotfix*'
+      - release
+      - candidate
 
 jobs:
-  create_pull_requests:
+  create_downmerge_pr_from_release_to_candidate:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'hotfix') && github.ref == 'refs/heads/release'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -17,22 +20,66 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Create Pull Request to candidate
+      - name: Create downmerge pull request from release to candidate
         uses: repo-sync/pull-request@v2
         with:
-          source_branch: ${{ github.ref_name }}
+          source_branch: release
           destination_branch: candidate
-          pr_title: "hotfix: from ${{ github.ref_name }} to candidate"
-          pr_body: "This pull request was automatically created for hotfix branch `${{ github.ref_name }}` to merge into `candidate`."
+          pr_title: "hotfix: downmerge for ${{ github.event.pull_request.head.ref }} from release to candidate"
+          pr_body: "This PR was automatically created from a merged hotfix branch `${{ github.event.pull_request.head.ref }}` into `release`, now targeting `candidate`."
           pr_draft: false
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Pull Request to main
+  create_downmerge_pr_from_candidate_to_main:
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'release' && github.event.pull_request.base.ref == 'candidate'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create downmerge pull request from candidate to main
         uses: repo-sync/pull-request@v2
         with:
-          source_branch: ${{ github.ref_name }}
+          source_branch: candidate
           destination_branch: main
-          pr_title: "hotfix: from ${{ github.ref_name }} to main"
-          pr_body: "This pull request was automatically created for hotfix branch `${{ github.ref_name }}` to merge into `main`."
+          pr_title: "hotfix: downmerge from candidate to main"
+          pr_body: "This PR was automatically created due to a merged PR from `release` to `candidate`, now targeting `main`."
+          pr_draft: false
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  create_downmerge_and_upmerge_pr_for_candidate_hotfix:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'hotfix') && github.ref == 'refs/heads/candidate'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create upmerge pull request from candidate to release for hotfix
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: candidate
+          destination_branch: release
+          pr_title: "hotfix: upmerge from candidate to release for ${{ github.event.pull_request.head.ref }}"
+          pr_body: "This PR was automatically created from a merged hotfix branch `${{ github.event.pull_request.head.ref }}` into `candidate`, now targeting `release`."
+          pr_draft: false
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create downmerge pull request from candidate to main for hotfix
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: candidate
+          destination_branch: main
+          pr_title: "hotfix: downmerge from candidate to main for ${{ github.event.pull_request.head.ref }}"
+          pr_body: "This PR was automatically created from a merged hotfix branch `${{ github.event.pull_request.head.ref }}` into `candidate`, now targeting `main`."
           pr_draft: false
           github_token: ${{ secrets.GITHUB_TOKEN }}
