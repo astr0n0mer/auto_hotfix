@@ -2,6 +2,8 @@ feature 1
 
 feature_2
 
+feature_3
+
 feature_4
 
 hotfix_1
