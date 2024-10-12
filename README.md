@@ -9,5 +9,12 @@ feature_4
 feature_5
 
 hotfix_1
-hotfix_2
-    hotfix_2_sub_commit_1
+
+hotfix_2.1
+hotfix_2.2
+
+hotfix_3.1
+hotfix_3.2
+hotfix_3.3
+hotfix_3.4
+hotfix_3.5
